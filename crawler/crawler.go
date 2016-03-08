@@ -1,9 +1,8 @@
-package main
+package crawler
 
 import (
 	"fmt"
 	"net/http"
-	"os"
 	"strings"
 
 	"golang.org/x/net/html"
@@ -69,14 +68,14 @@ func crawl(url string, ch chan string, chFinished chan bool) {
 	f(root)
 }
 
-func main() {
+func init(urls []strings) {
 	foundUrls := make(map[string]bool)
-	seedUrls := os.Args[1:]
+	// seedUrls := os.Args[1:]
 
 	chUrls := make(chan string)
 	chFinished := make(chan bool)
 
-	for _, url := range seedUrls {
+	for _, url := range urls {
 		go crawl(url, chUrls, chFinished)
 	}
 
