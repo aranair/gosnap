@@ -1,18 +1,19 @@
 package config
 
 import (
-	"database/sql"
+	"log"
 
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
 	_ "github.com/lib/pq"
 )
 
-func NewDB(dataSourceName string) (*sql.DB, error) {
-	db, err := sql.Open("postgres", dataSourceName)
+var Db *gorm.DB
+
+func InitDb(dataSourceName string) {
+	var err error
+	Db, err = gorm.Open("postgres", dataSourceName)
 	if err != nil {
-		return nil, err
+		log.Panic(err)
 	}
-	if err = db.Ping(); err != nil {
-		return nil, err
-	}
-	return db, nil
 }

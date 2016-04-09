@@ -18,14 +18,12 @@ func main() {
 	}
 
 	pqStr := "user=" + conf.DB.User + " password='" + conf.DB.Password + "' dbname=gosnap host=localhost sslmode=disable"
-	db, err := config.NewDB(pqStr)
-	if err != nil {
-		log.Panic(err)
-	}
+
+	config.InitDb(pqStr)
 
 	router := gin.Default()
 
-	var api = __api__{DB: db}
+	var api = __api__{}
 
 	// Attach api
 	api.bind(router.Group(conf.Api.Prefix))

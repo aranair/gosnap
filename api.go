@@ -1,15 +1,14 @@
 package main
 
 import (
-	"database/sql"
 	"net/http"
 
-	"github.com/aranair/gosnap/listings"
+	"github.com/aranair/gosnap/crawler"
+	"github.com/aranair/gosnap/models"
 	"github.com/gin-gonic/gin"
 )
 
 type __api__ struct {
-	DB *sql.DB
 }
 
 func (api __api__) bind(r *gin.RouterGroup) {
@@ -18,13 +17,26 @@ func (api __api__) bind(r *gin.RouterGroup) {
 }
 
 func (api __api__) listingIndex(c *gin.Context) {
-	var listings = listings.AllListings(api.DB)
+	l := models.ListListings()
 	c.JSON(http.StatusOK, gin.H{
-		"listings": listings,
+		"listings": l,
 	})
 }
 
 func (api __api__) updateListings(c *gin.Context) {
+	urls := map[int][]string{
+		1: []string{"http://www.clubsnap.com/forums/forumdisplay.php?f=104"},
+		2: []string{"http://www.clubsnap.com/forums/forumdisplay.php?f=102"},
+		3: []string{"http://www.clubsnap.com/forums/forumdisplay.php?f=111"},
+	}
+
+	for cid, urla := range urls {
+		l := crawler.Start(urla)
+		for title, url := range l {
+			models.CreateListing(cid, title, url)
+		}
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"success": "true",
 	})

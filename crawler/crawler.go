@@ -34,7 +34,7 @@ func parseLink(n *html.Node) (title string, url string) {
 }
 
 // Extract all http** links from a given webpage
-func crawl(url string, ch chan string, chFinished chan bool) {
+func Crawl(url string, ch chan []string, chFinished chan bool) {
 	resp, err := http.Get(url)
 
 	defer func() {
@@ -56,8 +56,7 @@ func crawl(url string, ch chan string, chFinished chan bool) {
 		if n.Type == html.ElementNode && n.Data == "a" {
 			title, url := parseLink(n)
 			if len(title) > 0 && len(url) > 0 {
-				fmt.Println(title)
-				fmt.Println(url)
+				ch <- []string{title, url}
 			}
 		}
 		for c := n.FirstChild; c != nil; c = c.NextSibling {
@@ -68,31 +67,53 @@ func crawl(url string, ch chan string, chFinished chan bool) {
 	f(root)
 }
 
-func init(urls []strings) {
-	foundUrls := make(map[string]bool)
-	// seedUrls := os.Args[1:]
-
-	chUrls := make(chan string)
+func Start(seedUrls []string) map[string]string {
+	foundUrls := make(map[string]string)
+	chUrls := make(chan []string)
 	chFinished := make(chan bool)
 
-	for _, url := range urls {
-		go crawl(url, chUrls, chFinished)
+	for _, url := range seedUrls {
+		go Crawl(url, chUrls, chFinished)
 	}
 
 	for c := 0; c < len(seedUrls); {
 		select {
-		case url := <-chUrls:
-			foundUrls[url] = true
+		case arr := <-chUrls:
+			foundUrls[arr[0]] = arr[1]
 		case <-chFinished:
 			c++
 		}
 	}
 
-	fmt.Println("\nFound", len(foundUrls), "unique urls:\n")
-
-	for url, _ := range foundUrls {
-		fmt.Println(" - " + url)
-	}
-
 	close(chUrls)
+	return foundUrls
 }
+
+// func init() {
+// 	foundUrls := make(map[string]bool)
+// 	seedUrls := os.Args[1:]
+
+// 	chUrls := make(chan string)
+// 	chFinished := make(chan bool)
+
+// 	for _, url := range seedUrls {
+// 		go Crawl(url, chUrls, chFinished)
+// 	}
+
+// 	for c := 0; c < len(seedUrls); {
+// 		select {
+// 		case url := <-chUrls:
+// 			foundUrls[url] = true
+// 		case <-chFinished:
+// 			c++
+// 		}
+// 	}
+
+// 	fmt.Println("\nFound", len(foundUrls), "unique urls:\n")
+
+// 	for url, _ := range foundUrls {
+// 		fmt.Println(" - " + url)
+// 	}
+
+// 	close(chUrls)
+// }
