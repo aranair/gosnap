@@ -1,4 +1,4 @@
-FROM golang:1.4
+FROM golang:onbuild
 
 RUN go get bitbucket.org/liamstask/goose/cmd/goose
 RUN go get github.com/aranair/gosnap
