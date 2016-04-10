@@ -33,9 +33,9 @@ func main() {
 	// Attach api
 	api.bind(router.Group(conf.Api.Prefix))
 
-	router.GET("/jobrunner/json", JobJson)
-	routes.LoadHTMLGlob("../github.com/bamzi/jobrunner/views/Status.html")
-	routes.GET("/jobrunner/html", JobHtml)
+	// router.GET("/jobrunner/json", JobJson)
+	// routes.LoadHTMLGlob("../github.com/bamzi/jobrunner/views/Status.html")
+	// routes.GET("/jobrunner/html", JobHtml)
 	router.Run(":5000")
 }
 
