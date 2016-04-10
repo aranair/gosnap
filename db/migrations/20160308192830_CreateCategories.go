@@ -2,6 +2,8 @@ package main
 
 import (
 	"database/sql"
+
+	_ "bitbucket.org/liamstask/goose/cmd/goose"
 )
 
 // Up is executed when this migration is applied
