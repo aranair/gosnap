@@ -15,7 +15,7 @@ type Listing struct {
 }
 
 func ListListings() (list []Listing) {
-	config.Db.Where("created_at >= ?", time.Now().AddDate(0, 0, -2)).Find(&list)
+	config.Db.Where("created_at >= ?", time.Now().AddDate(0, 0, -1)).Find(&list)
 	return
 }
 

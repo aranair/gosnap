@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"log"
+	"os"
 
 	"github.com/aranair/gosnap/config"
 	"github.com/aranair/gosnap/crawler"
@@ -20,10 +22,13 @@ func main() {
 		log.Fatal(err)
 	}
 
+	postgresAddr := os.Getenv("POSTGRES_PORT_5432_TCP_ADDR")
+
 	jobrunner.Start()
 	jobrunner.Schedule("@every 30s", UpdateListings{})
 
-	pqStr := "user=" + conf.DB.User + " password='" + conf.DB.Password + "' dbname=gosnap host=localhost sslmode=disable"
+	pqStr := "host=" + postgresAddr + " user=" + conf.DB.User + " password='" + conf.DB.Password + "' dbname=gosnap sslmode=disable"
+	fmt.Println(pqStr)
 
 	config.InitDb(pqStr)
 	router := gin.Default()
@@ -32,16 +37,14 @@ func main() {
 
 	// Attach api
 	api.bind(router.Group(conf.Api.Prefix))
-
-	// router.GET("/jobrunner/json", JobJson)
-	// routes.LoadHTMLGlob("../github.com/bamzi/jobrunner/views/Status.html")
-	// routes.GET("/jobrunner/html", JobHtml)
 	router.Run(":5000")
 }
 
 type UpdateListings struct{}
 
 func (e UpdateListings) Run() {
+	fmt.Println("Auto Updating Listings.")
+
 	urls := map[int][]string{
 		1: []string{"http://www.clubsnap.com/forums/forumdisplay.php?f=104"},
 		2: []string{"http://www.clubsnap.com/forums/forumdisplay.php?f=102"},

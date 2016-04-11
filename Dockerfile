@@ -1,14 +1,11 @@
 FROM golang:onbuild
 
 RUN go get bitbucket.org/liamstask/goose/cmd/goose
-RUN go get github.com/aranair/gosnap
 
-WORKDIR /go/src/github.com/aranair/gosnap
-RUN go get ./...
-RUN go install ./...
+RUN ["apt-get", "update"]
+RUN ["apt-get", "install", "-y", "vim"]
 
 ADD configs.toml /go/bin/
-
-ENTRYPOINT /go/bin/gosnap
+ADD dbconf.yml /go/src/app/db/
 
 EXPOSE 5000
